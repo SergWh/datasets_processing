@@ -3,9 +3,8 @@ from enum import Enum
 START_STR = 'start'
 END_STR = 'end'
 PITCH_STR = 'pitch'
-VELOCITY_STR = 'velocity'
 STYLE_STR = 'style'
-CSV_HEADER = [START_STR, END_STR, PITCH_STR, VELOCITY_STR, STYLE_STR]
+CSV_HEADER = [START_STR, END_STR, PITCH_STR, STYLE_STR]
 
 
 class Style(Enum):
@@ -34,7 +33,7 @@ class Style(Enum):
         elif label == 'slide':
             return Style.SLIDE
         else:
-            raise NotImplementedError
+            return 'normal'
 
     def to_str(self):
         if self == Style.NORMAL:
@@ -57,28 +56,30 @@ class Note:
     start = 0.0
     end = 0.0
     style = Style.NORMAL
-    velocity = 0
     pitch = 0.0
 
-    def __init__(self, start, end, style, velocity, pitch):
+    def __init__(self, start, end, style, pitch):
         self.start = start
         self.end = end
         self.style = style
-        self.velocity = velocity
         self.pitch = pitch
 
     @staticmethod
     def parse_csv_row(row):
+        pitch = (row[PITCH_STR])
+        if pitch == 'nan':
+            pitch = -1
+        else:
+            pitch = int(float(pitch))
         return Note(
             start=float(row[START_STR]),
             end=float(row[END_STR]),
-            pitch=int(row[PITCH_STR]),
-            velocity=int(row[VELOCITY_STR]),
+            pitch=pitch,
             style=Style.parse(row[STYLE_STR])
         )
 
     def __str__(self):
-        return f'start={self.start},end={self.end},style={self.style},velo={self.velocity},pitch={self.pitch}'
+        return f'start={self.start},end={self.end},style={self.style},pitch={self.pitch}'
 
     def __repr__(self):
         return self.__str__()
